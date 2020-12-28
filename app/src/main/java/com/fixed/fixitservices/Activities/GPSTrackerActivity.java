@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ProgressBar;
 
 import com.fixed.fixitservices.R;
+import com.fixed.fixitservices.Utils.GetAddress;
+import com.fixed.fixitservices.Utils.SharedPrefs;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -126,6 +128,7 @@ public class GPSTrackerActivity extends AppCompatActivity implements
                 intent.putExtra("Longitude", mLastLocation.getLongitude());
                 intent.putExtra("Latitude", mLastLocation.getLatitude());
                 setResult(RESULT_OK, intent);
+                SharedPrefs.setCity(GetAddress.getCity(GPSTrackerActivity.this, mLastLocation.getLatitude(), mLastLocation.getLongitude()));
                 manager.removeUpdates(locationListener);
 
                 finish();
@@ -148,6 +151,8 @@ public class GPSTrackerActivity extends AppCompatActivity implements
                                     intent.putExtra("Longitude", location.getLongitude());
                                     intent.putExtra("Latitude", location.getLatitude());
                                     setResult(RESULT_OK, intent);
+
+                                    SharedPrefs.setCity(GetAddress.getCity(GPSTrackerActivity.this, location.getLatitude(), location.getLongitude()));
                                     manager.removeUpdates(locationListener);
 
                                     finish();

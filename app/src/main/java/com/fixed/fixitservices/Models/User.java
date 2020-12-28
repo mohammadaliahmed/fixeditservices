@@ -7,16 +7,18 @@ public class User {
     String fullName;
     String googleAddress;
     double lat,lon;
+    String city;
 
     public User(String firstname, String lastname, String username, String password,
                 String email, String mobile, String phone,
                 String address, String fcmKey, long time, boolean numberVerified
-                ,String googleAddress,double lat,double lon
+                ,String googleAddress,double lat,double lon,String city
 
     ) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.username = username;
+        this.city = city;
         this.password = password;
         this.email = email;
         this.mobile = mobile;
@@ -34,6 +36,13 @@ public class User {
     public User() {
     }
 
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;

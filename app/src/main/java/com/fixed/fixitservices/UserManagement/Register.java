@@ -10,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.fixed.fixitservices.Activities.MainActivity;
@@ -29,7 +32,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Register extends AppCompatActivity {
     Button signUp;
@@ -41,6 +46,9 @@ public class Register extends AppCompatActivity {
     private double lat, lon;
     private String returnString;
     String userId;
+    Spinner citySpinner;
+    private ArrayList<String> cityList = new ArrayList<>();
+    private String cityChosen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +57,7 @@ public class Register extends AppCompatActivity {
         signUp = findViewById(R.id.signUp);
         firstname = findViewById(R.id.firstname);
         lastname = findViewById(R.id.lastname);
+        citySpinner = findViewById(R.id.citySpinner);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         confirmPassword = findViewById(R.id.confirmPassword);
@@ -59,7 +68,7 @@ public class Register extends AppCompatActivity {
         address = findViewById(R.id.address);
         userId = getIntent().getStringExtra("userId");
         if (userId != null) {
-            if(LoginMenu.account!=null) {
+            if (LoginMenu.account != null) {
                 firstname.setText((LoginMenu.account.getDisplayName().split(" "))[0]);
                 lastname.setText((LoginMenu.account.getDisplayName().split(" "))[1]);
                 username.setText(LoginMenu.account.getDisplayName().replace(" ", ""));
@@ -68,10 +77,10 @@ public class Register extends AppCompatActivity {
                 password.setVisibility(View.GONE);
                 confirmPassword.setVisibility(View.GONE);
                 email.setText(LoginMenu.account.getEmail());
-            }else if(LoginMenu.profile!=null){
+            } else if (LoginMenu.profile != null) {
                 firstname.setText(LoginMenu.profile.getFirstName());
                 lastname.setText(LoginMenu.profile.getLastName());
-                username.setText(LoginMenu.profile.getFirstName()+LoginMenu.profile.getLastName());
+                username.setText(LoginMenu.profile.getFirstName() + LoginMenu.profile.getLastName());
                 password.setText("abc123");
                 confirmPassword.setText("abc123");
                 password.setVisibility(View.GONE);
@@ -155,6 +164,8 @@ public class Register extends AppCompatActivity {
                     address.setError("Enter address");
                 } else if (returnString == null) {
                     CommonUtils.showToast("Please select google address");
+                }else if (cityChosen .equalsIgnoreCase("Choose city")) {
+                    CommonUtils.showToast("Please select city");
                 } else {
 //                    singUpUser();
                     checkUser();
@@ -162,6 +173,23 @@ public class Register extends AppCompatActivity {
             }
         });
 
+        mDatabase.child("Cities").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    cityList.add("Choose City");
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        cityList.add(snapshot.getKey());
+                    }
+                    setupSpinner();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -200,7 +228,7 @@ public class Register extends AppCompatActivity {
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
@@ -214,6 +242,8 @@ public class Register extends AppCompatActivity {
             }
         } else if (requestCode == 1 && resultCode == 0) {
         }
+
+
     }
 
     private void singUpUser() {
@@ -232,7 +262,7 @@ public class Register extends AppCompatActivity {
                 false,
                 returnString,
                 lat,
-                lon
+                lon, cityChosen
         );
 
         mDatabase.child("Users").child(userId == null ? username.getText().toString() : userId).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -250,6 +280,32 @@ public class Register extends AppCompatActivity {
         });
 
     }
+
+    private void setupSpinner() {
+
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, cityList);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        citySpinner.setAdapter(dataAdapter);
+        citySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                gridViewAdapter.getFilter().filter(list.get(position));
+
+                cityChosen=cityList.get(position);
+                SharedPrefs.setCity(cityChosen);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+    }
+
 
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);

@@ -1,6 +1,7 @@
 package com.fixed.fixitservices.Models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OrderModel {
     long orderId;
@@ -42,7 +43,9 @@ public class OrderModel {
     boolean peakHour;
     long serviceCharges;
     int tax;
-
+    String city;
+    String vendor;
+    List<String> beforeWorkPictures;
 
     public OrderModel(long orderId, long time, User user, ArrayList<ServiceCountModel> countModelArrayList,
                       long totalPrice, long totalHours, String instructions, String date, String chosenTime,
@@ -50,7 +53,7 @@ public class OrderModel {
                       double lat, double lon,
                       String buildingType, String serviceName,String serviceId, boolean couponApplied,
                       String couponCode,
-                      int discount, boolean commercialBuilding,int tax) {
+                      int discount, boolean commercialBuilding,int tax,String city,String vendor,List<String> beforeWorkPictures) {
         this.orderId = orderId;
         this.time = time;
         this.user = user;
@@ -72,9 +75,36 @@ public class OrderModel {
         this.discount = discount;
         this.commercialBuilding = commercialBuilding;
         this.tax = tax;
+        this.city = city;
+        this.vendor = vendor;
+        this.beforeWorkPictures = beforeWorkPictures;
+
 
     }
 
+    public List<String> getBeforeWorkPictures() {
+        return beforeWorkPictures;
+    }
+
+    public void setBeforeWorkPictures(List<String> beforeWorkPictures) {
+        this.beforeWorkPictures = beforeWorkPictures;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public int getTax() {
         return tax;

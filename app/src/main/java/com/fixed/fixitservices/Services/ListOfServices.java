@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.fixed.fixitservices.R;
+import com.fixed.fixitservices.Utils.SharedPrefs;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,7 +59,7 @@ public class ListOfServices extends AppCompatActivity {
     }
 
     private void getDataFromDB() {
-        mDatabase.child("Services").addValueEventListener(new ValueEventListener() {
+        mDatabase.child("ServicesList").child(SharedPrefs.getCity()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {

@@ -51,6 +51,14 @@ public class SharedPrefs {
     public static String getAdminFcmKey() {
         return preferenceGetter("setAdminFcmKey");
     }
+    public static void setCity(String value) {
+
+        preferenceSetter("setCity", value);
+    }
+
+    public static String getCity() {
+        return preferenceGetter("setCity");
+    }
 
 
     public static void setFcmKey(String fcmKey) {

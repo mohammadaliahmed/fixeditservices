@@ -186,11 +186,41 @@
 
                 android:textSize="13sp" />
 
+            <!--            <EditText-->
+            <!--                android:id="@+id/city"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/edit_text_bg"-->
+            <!--                android:hint="*City"-->
+            <!--                android:inputType="textCapWords"-->
+            <!--                android:padding="10dp"-->
+            <!--                android:textColorHint="#686868"-->
+
+            <!--                android:textSize="13sp" />-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/edit_text_bg">
+
+
+                <Spinner
+                    android:id="@+id/citySpinner"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
             <TextView
+                android:id="@+id/googleMapAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:id="@+id/googleMapAddress"
                 android:background="@drawable/edit_text_bg"
                 android:hint="*Google map"
                 android:padding="10dp"

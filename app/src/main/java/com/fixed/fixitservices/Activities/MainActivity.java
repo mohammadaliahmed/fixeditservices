@@ -1,9 +1,13 @@
 package com.fixed.fixitservices.Activities;
 
+import android.Manifest;
 import android.app.DownloadManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -20,9 +24,11 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import android.view.Menu;
@@ -62,6 +68,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getPermissions();
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         username = findViewById(R.id.username);
@@ -363,4 +371,53 @@ public class MainActivity extends AppCompatActivity
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename + ".pdf");
         Long referene = downloadManager.enqueue(request);
     }
+
+    private void getPermissions() {
+
+
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                Manifest.permission.ACCESS_FINE_LOCATION
+
+        };
+
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        } else {
+            Intent intent = new Intent(MainActivity.this, GPSTrackerActivity.class);
+            startActivityForResult(intent, 1);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        try {
+            if (permissions[0].equalsIgnoreCase("android.permission.ACCESS_FINE_LOCATION") && grantResults[0] == 0) {
+                Intent intent = new Intent(MainActivity.this, GPSTrackerActivity.class);
+                startActivityForResult(intent, 1);
+
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            getPermissions();
+        }
+
+    }
+
+    public boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                } else {
+//                    CommonUtils.showToast("granted");
+                    Intent intent = new Intent(MainActivity.this, GPSTrackerActivity.class);
+                    startActivityForResult(intent, 1);
+                }
+            }
+        }
+        return true;
+    }
 }
+

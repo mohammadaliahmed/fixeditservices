@@ -2,10 +2,12 @@ package com.fixed.fixitservices.Services;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -158,7 +160,7 @@ public class ListOfSubServices extends AppCompatActivity {
     }
 
     private void getParentServiceFromDB() {
-        mDatabase.child("Services").child(parentService).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("ServicesList").child(SharedPrefs.getCity()).child(parentService).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
@@ -176,7 +178,7 @@ public class ListOfSubServices extends AppCompatActivity {
     }
 
     private void getUserCartProductsFromDB() {
-        if(SharedPrefs.getUser()!=null) {
+        if (SharedPrefs.getUser() != null) {
             mDatabase.child("Users").child(SharedPrefs.getUser().
                     getUsername()).child("Cart").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -211,7 +213,7 @@ public class ListOfSubServices extends AppCompatActivity {
     }
 
     private void getDataFromDB() {
-        mDatabase.child("SubServices").addValueEventListener(new ValueEventListener() {
+        mDatabase.child("SubServices").child(SharedPrefs.getCity()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
@@ -219,7 +221,7 @@ public class ListOfSubServices extends AppCompatActivity {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         SubServiceModel model = snapshot.getValue(SubServiceModel.class);
                         if (model != null) {
-                            if(model.getParentService()!=null) {
+                            if (model.getParentService() != null) {
                                 if (model.getParentService().contains(parentService)) {
                                     itemList.add(model);
                                 }

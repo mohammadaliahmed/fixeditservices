@@ -16,11 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.fixed.fixitservices.Models.AdminModel;
 import com.fixed.fixitservices.Models.CouponModel;
 import com.fixed.fixitservices.Models.OrderModel;
 import com.fixed.fixitservices.Models.ServiceCountModel;
 import com.fixed.fixitservices.Models.User;
+import com.fixed.fixitservices.Models.VendorModel;
 import com.fixed.fixitservices.R;
 import com.fixed.fixitservices.Services.ChooseServiceOptions;
 import com.fixed.fixitservices.Services.ListOfSubServices;
@@ -63,7 +63,7 @@ public class ChooseAddress extends AppCompatActivity implements NotificationObse
     private CouponModel couponModel;
     LinearLayout couponAppliedView, applyCouponView;
     TextView orderDetails;
-    private AdminModel adminModel;
+    private VendorModel adminModel;
     EditText instructions;
 
     @Override
@@ -192,81 +192,80 @@ public class ChooseAddress extends AppCompatActivity implements NotificationObse
 
     private void placeOrderNow() {
         String city = GetAddress.getCity(ChooseAddress.this, SharedPrefs.getUser().getLat(), SharedPrefs.getUser().getLon());
-        if (adminModel.getProvidingServiceInCities().contains(city)) {
-            User us = SharedPrefs.getUser();
-            us.setFcmKey(FirebaseInstanceId.getInstance().getToken());
-            SharedPrefs.setUser(us);
-            if (SharedPrefs.getUser().getGoogleAddress() != null && SharedPrefs.getUser().getGoogleAddress().equalsIgnoreCase("")) {
-                CommonUtils.showToast("Please choose one address");
-            } else {
-                wholeLayout.setVisibility(View.VISIBLE);
-                final OrderModel model = new OrderModel(
-                        orderId,
-                        System.currentTimeMillis(),
-                        SharedPrefs.getUser(),
-                        ListOfSubServices.orderList,
-                        finalTotalCost,
-                        finalTotalTime,
-                        instructions.getText().toString(),
-                        orderDate,
-                        ChooseServiceOptions.timeSelected,
-                        "Pending",
-                        SharedPrefs.getUser().getGoogleAddress(),
-                        SharedPrefs.getUser().getLat(),
-                        SharedPrefs.getUser().getLon(),
-                        ChooseServiceOptions.buildingType,
-                        ListOfSubServices.parentServiceModel.getName(),
-                        ListOfSubServices.parentServiceModel.getId(),
-                        couponOk,
-                        couponOk ? couponModel.getCouponCode() : "",
-                        couponOk ? couponModel.getDiscount() : 0,
-                        ChooseServiceOptions.buildingType.equalsIgnoreCase("commercial"),
-                        adminModel.getTax()
-
-
-                );
-
-
-                final String finalOrderDate = orderDate;
-                mDatabase.child("Orders").child("" + orderId).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        CommonUtils.sendMessage(number, "FIXEDIT \nNew " + model.getServiceName() + " order \nOrder Id: " + orderId
-                                + "\n\nClick to view: \n" + Constants.FIXEDIT_URL + "admin/" + orderId);
-                        ;
-                        CommonUtils.sendMessage(SharedPrefs.getUser().getMobile(), "FIXEDIT\n\nOrder was successfully placed\n" +
-                                "Order Id: " + model.getOrderId() + "\n\nYou will receive a call shortly for order confirmation");
-                        mDatabase.child("TimeSlots").child(ListOfSubServices.parentService)
-                                .child(CommonUtils.getYear(System.currentTimeMillis()))
-                                .child(CommonUtils.getMonthName(System.currentTimeMillis()))
-                                .child(finalOrderDate)
-                                .child(ChooseServiceOptions.timeSelected).setValue(ChooseServiceOptions.timeSelected);
-
-                        mDatabase.child("Users").child(SharedPrefs.getUser().getUsername()).child("Orders").child("" + orderId).setValue(orderId);
-                        mDatabase.child("Users").child(SharedPrefs.getUser().getUsername()).child("Cart").removeValue()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        wholeLayout.setVisibility(View.GONE);
-                                        NotificationAsync notificationAsync = new NotificationAsync(ChooseAddress.this);
-                                        String notification_title = "New " + ListOfSubServices.parentServiceModel.getName() + " order from " + SharedPrefs.getUser().getFullName();
-                                        String notification_message = "Click to view";
-                                        notificationAsync.execute("ali", adminFcmKey, notification_title, notification_message, "Order", "" + orderId);
-                                        Intent i = new Intent(ChooseAddress.this, OrderPlaced.class);
-                                        i.putExtra("orderId", orderId);
-                                        i.putExtra("estimatedCost", finalTotalCost);
-                                        i.putExtra("estimatedTime", finalTotalTime);
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                });
-
-                    }
-                });
-            }
+        User us = SharedPrefs.getUser();
+        us.setFcmKey(FirebaseInstanceId.getInstance().getToken());
+        SharedPrefs.setUser(us);
+        if (SharedPrefs.getUser().getGoogleAddress() != null && SharedPrefs.getUser().getGoogleAddress().equalsIgnoreCase("")) {
+            CommonUtils.showToast("Please choose one address");
         } else {
-            CommonUtils.showToast("We are not providing service in " + city);
+            wholeLayout.setVisibility(View.VISIBLE);
+            final OrderModel model = new OrderModel(
+                    orderId,
+                    System.currentTimeMillis(),
+                    SharedPrefs.getUser(),
+                    ListOfSubServices.orderList,
+                    finalTotalCost,
+                    finalTotalTime,
+                    instructions.getText().toString(),
+                    orderDate,
+                    ChooseServiceOptions.timeSelected,
+                    "Pending",
+                    SharedPrefs.getUser().getGoogleAddress(),
+                    SharedPrefs.getUser().getLat(),
+                    SharedPrefs.getUser().getLon(),
+                    ChooseServiceOptions.buildingType,
+                    ListOfSubServices.parentServiceModel.getName(),
+                    ListOfSubServices.parentServiceModel.getId(),
+                    couponOk,
+                    couponOk ? couponModel.getCouponCode() : "",
+                    couponOk ? couponModel.getDiscount() : 0,
+                    ChooseServiceOptions.buildingType.equalsIgnoreCase("commercial"),
+                    2
+                    ,SharedPrefs.getCity(),
+                    adminModel.getUsername(),
+                    BookingSumary.uploadUrlList
+
+            );
+
+
+            final String finalOrderDate = orderDate;
+            mDatabase.child("Orders").child("" + orderId).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    CommonUtils.sendMessage(number, "FIXEDIT \nNew " + model.getServiceName() + " order \nOrder Id: " + orderId
+                            + "\n\nClick to view: \n" + Constants.FIXEDIT_URL + "admin/" + orderId);
+                    ;
+                    CommonUtils.sendMessage(SharedPrefs.getUser().getMobile(), "FIXEDIT\n\nOrder was successfully placed\n" +
+                            "Order Id: " + model.getOrderId() + "\n\nYou will receive a call shortly for order confirmation");
+                    mDatabase.child("TimeSlots").child(ListOfSubServices.parentService)
+                            .child(CommonUtils.getYear(System.currentTimeMillis()))
+                            .child(CommonUtils.getMonthName(System.currentTimeMillis()))
+                            .child(finalOrderDate)
+                            .child(ChooseServiceOptions.timeSelected).setValue(ChooseServiceOptions.timeSelected);
+
+                    mDatabase.child("Users").child(SharedPrefs.getUser().getUsername()).child("Orders").child("" + orderId).setValue(orderId);
+                    mDatabase.child("Users").child(SharedPrefs.getUser().getUsername()).child("Cart").removeValue()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    wholeLayout.setVisibility(View.GONE);
+                                    NotificationAsync notificationAsync = new NotificationAsync(ChooseAddress.this);
+                                    String notification_title = "New " + ListOfSubServices.parentServiceModel.getName() + " order from " + SharedPrefs.getUser().getFullName();
+                                    String notification_message = "Click to view";
+                                    notificationAsync.execute("ali", adminFcmKey, notification_title, notification_message, "Order", "" + orderId);
+                                    Intent i = new Intent(ChooseAddress.this, OrderPlaced.class);
+                                    i.putExtra("orderId", orderId);
+                                    i.putExtra("estimatedCost", finalTotalCost);
+                                    i.putExtra("estimatedTime", finalTotalTime);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            });
+
+                }
+            });
         }
+
     }
 
     private void getCouponsFromDb() {
@@ -314,16 +313,21 @@ public class ChooseAddress extends AppCompatActivity implements NotificationObse
 
 
     private void getAdminFCMkey() {
-        mDatabase.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Vendors").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null) {
-                    adminModel = dataSnapshot.getValue(AdminModel.class);
-                    if (adminModel != null) {
-                        adminFcmKey = adminModel.getFcmKey();
-                        number = adminModel.getAdminNumber();
-                        SharedPrefs.setAdminFcmKey(adminFcmKey);
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        adminModel = snapshot.getValue(VendorModel.class);
+                        if (adminModel.getCity().equalsIgnoreCase(SharedPrefs.getCity())) {
+                            if (adminModel != null) {
+                                adminFcmKey = adminModel.getFcmKey();
+                                number = adminModel.getPhone();
+                                SharedPrefs.setAdminFcmKey(adminFcmKey);
+                            }
+                        }
                     }
+
 
                 }
             }
